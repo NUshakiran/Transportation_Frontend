@@ -1,0 +1,52 @@
+package com.example.booking_service.feign;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+@FeignClient(name = "vehicle-service", url = "http://localhost:1002/api/vehicles")
+public interface VehicleClient {
+
+    @GetMapping("/{id}")
+    Vehicle getVehicleById(@PathVariable("id") Long id);
+
+    class Vehicle {
+        public Long vehicleId;
+        public String vehicleNumber;
+        public String type;
+        public Integer capacity;
+        public String status;
+		public Long getVehicleId() {
+			return vehicleId;
+		}
+		public void setVehicleId(Long vehicleId) {
+			this.vehicleId = vehicleId;
+		}
+		public String getVehicleNumber() {
+			return vehicleNumber;
+		}
+		public void setVehicleNumber(String vehicleNumber) {
+			this.vehicleNumber = vehicleNumber;
+		}
+		public String getType() {
+			return type;
+		}
+		public void setType(String type) {
+			this.type = type;
+		}
+		public Integer getCapacity() {
+			return capacity;
+		}
+		public void setCapacity(Integer capacity) {
+			this.capacity = capacity;
+		}
+		public String getStatus() {
+			return status;
+		}
+		public void setStatus(String status) {
+			this.status = status;
+		}
+        
+        
+    }
+}

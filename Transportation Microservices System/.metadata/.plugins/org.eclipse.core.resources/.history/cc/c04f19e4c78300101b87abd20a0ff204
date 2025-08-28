@@ -1,0 +1,12 @@
+package com.example.booking_service.feign;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+
+@FeignClient(name = "driver-service", url = "http://localhost:1000/api/drivers")
+public interface DriverClient {
+    @GetMapping("/{id}")
+    void validateDriverExists(@PathVariable("id") Long id);
+}

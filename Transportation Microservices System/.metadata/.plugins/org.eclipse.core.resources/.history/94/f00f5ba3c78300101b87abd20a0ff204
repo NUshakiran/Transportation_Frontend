@@ -1,0 +1,51 @@
+package com.example.booking_service.feign;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+@FeignClient(name = "route-service", url = "http://localhost:1004/api/routes")
+public interface RouteClient {
+    @GetMapping("/{id}")
+    Route getRouteById(@PathVariable("id") Long id);
+
+    class Route {
+        public Long routeId;
+        public String source;
+        public String destination;
+        public Double distance;
+        public String estimatedTime;
+		public Long getRouteId() {
+			return routeId;
+		}
+		public void setRouteId(Long routeId) {
+			this.routeId = routeId;
+		}
+		public String getSource() {
+			return source;
+		}
+		public void setSource(String source) {
+			this.source = source;
+		}
+		public String getDestination() {
+			return destination;
+		}
+		public void setDestination(String destination) {
+			this.destination = destination;
+		}
+		public Double getDistance() {
+			return distance;
+		}
+		public void setDistance(Double distance) {
+			this.distance = distance;
+		}
+		public String getEstimatedTime() {
+			return estimatedTime;
+		}
+		public void setEstimatedTime(String estimatedTime) {
+			this.estimatedTime = estimatedTime;
+		}
+        
+        
+    }
+}

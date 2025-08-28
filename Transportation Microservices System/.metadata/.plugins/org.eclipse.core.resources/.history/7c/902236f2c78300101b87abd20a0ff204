@@ -1,0 +1,67 @@
+package com.example.booking_service.service;
+
+import java.time.Instant;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.example.booking_service.exception.ResourceNotFoundException;
+import com.example.booking_service.feign.DriverClient;
+import com.example.booking_service.feign.RouteClient;
+import com.example.booking_service.feign.VehicleClient;
+import com.example.booking_service.model.Booking;
+import com.example.booking_service.model.BookingStatus;
+import com.example.booking_service.repository.BookingRepository;
+
+@Service
+public class BookingService {
+
+    @Autowired
+    private BookingRepository bookingRepository;
+
+    @Autowired private VehicleClient vehicleClient;
+    @Autowired private DriverClient driverClient;
+    @Autowired private RouteClient routeClient;
+
+    public Booking createBooking(Booking booking) {
+        // Validate related entities
+        try { vehicleClient.validateVehicleExists(booking.getVehicleId()); }
+        catch(Exception e){ throw new ResourceNotFoundException("Vehicle not found!"); }
+
+        try { driverClient.validateDriverExists(booking.getDriverId()); }
+        catch(Exception e){ throw new ResourceNotFoundException("Driver not found!"); }
+
+        try { routeClient.validateRouteExists(booking.getRouteId()); }
+        catch(Exception e){ throw new ResourceNotFoundException("Route not found!"); }
+
+        booking.setBookingStatus(
+            booking.getBookingStatus() != null ? booking.getBookingStatus() : BookingStatus.PENDING
+        );
+        booking.setBookingTime(Instant.now());
+        return bookingRepository.save(booking);
+    }
+
+    public List<Booking> getAllBookings() { return bookingRepository.findAll(); }
+
+    public Booking getBookingById(Long id) {
+        return bookingRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found with id: " + id));
+    }
+
+    public Booking updateBooking(Long id, Booking updated) {
+        Booking existing = getBookingById(id);
+        existing.setCustomerName(updated.getCustomerName());
+        existing.setContactNumber(updated.getContactNumber());
+        existing.setVehicleId(updated.getVehicleId());
+        existing.setDriverId(updated.getDriverId());
+        existing.setRouteId(updated.getRouteId());
+        existing.setBookingTime(updated.getBookingTime());
+        existing.setStartTime(updated.getStartTime());
+        existing.setEndTime(updated.getEndTime());
+        existing.setBookingStatus(updated.getBookingStatus());
+        return bookingRepository.save(existing);
+    }
+
+    public void deleteBooking(Long id) { bookingRepository.delete(getBookingById(id)); }
+}

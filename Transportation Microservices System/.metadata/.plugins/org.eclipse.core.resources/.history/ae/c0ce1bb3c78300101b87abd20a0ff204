@@ -1,0 +1,79 @@
+package com.example.booking_service.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.example.booking_service.exception.ResourceNotFoundException;
+import com.example.booking_service.feign.DriverClient;
+import com.example.booking_service.feign.RouteClient;
+import com.example.booking_service.feign.VehicleClient;
+import com.example.booking_service.model.Booking;
+import com.example.booking_service.model.BookingStatus;
+import com.example.booking_service.repository.BookingRepository;
+
+@Service
+public class BookingService {
+
+    private final BookingRepository bookingRepository;
+    private final DriverClient driverClient;
+    private final VehicleClient vehicleClient;
+    private final RouteClient routeClient;
+
+    public BookingService(BookingRepository bookingRepository,
+                          DriverClient driverClient,
+                          VehicleClient vehicleClient,
+                          RouteClient routeClient) {
+        this.bookingRepository = bookingRepository;
+        this.driverClient = driverClient;
+        this.vehicleClient = vehicleClient;
+        this.routeClient = routeClient;
+    }
+
+    public Booking createBooking(Booking booking) {
+        // Validate associated entities via Feign clients
+        driverClient.getDriverById(booking.getDriverId());
+        vehicleClient.getVehicleById(booking.getVehicleId());
+        routeClient.getRouteById(booking.getRouteId());
+
+        booking.setStatus(BookingStatus.SCHEDULED);
+
+        return bookingRepository.save(booking);
+    }
+
+    public List<Booking> getAllBookings() {
+        return bookingRepository.findAll();
+    }
+
+    public Booking getBookingById(Long id) {
+        return bookingRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found with id " + id));
+    }
+
+    public Booking updateBooking(Long id, Booking updatedBooking) {
+        Booking booking = getBookingById(id);
+
+        if (updatedBooking.getDriverId() != null)
+            driverClient.getDriverById(updatedBooking.getDriverId());
+
+        if (updatedBooking.getVehicleId() != null)
+            vehicleClient.getVehicleById(updatedBooking.getVehicleId());
+
+        if (updatedBooking.getRouteId() != null)
+            routeClient.getRouteById(updatedBooking.getRouteId());
+
+        booking.setDriverId(updatedBooking.getDriverId());
+        booking.setVehicleId(updatedBooking.getVehicleId());
+        booking.setRouteId(updatedBooking.getRouteId());
+        booking.setCustomerId(updatedBooking.getCustomerId());
+        booking.setStatus(updatedBooking.getStatus());
+
+        return bookingRepository.save(booking);
+    }
+
+    public void deleteBooking(Long id) {
+        Booking booking = getBookingById(id);
+        bookingRepository.delete(booking);
+    }
+}
+

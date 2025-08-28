@@ -1,0 +1,55 @@
+package com.example.booking_service.feign;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+@FeignClient(name = "driver-service", url = "http://localhost:1003/api/drivers")
+public interface DriverClient {
+
+    @GetMapping("/{id}")
+    Driver getDriverById(@PathVariable("id") Long id);
+
+    class Driver {
+        public Long driverId;
+        public String name;
+        public String licenseNumber;
+        public String phoneNumber;
+        public String status;
+        
+        
+		public Long getDriverId() {
+			return driverId;
+		}
+		
+		public void setDriverId(Long driverId) {
+			this.driverId = driverId;
+		}
+		public String getName() {
+			return name;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+		public String getLicenseNumber() {
+			return licenseNumber;
+		}
+		public void setLicenseNumber(String licenseNumber) {
+			this.licenseNumber = licenseNumber;
+		}
+		public String getPhoneNumber() {
+			return phoneNumber;
+		}
+		public void setPhoneNumber(String phoneNumber) {
+			this.phoneNumber = phoneNumber;
+		}
+		public String getStatus() {
+			return status;
+		}
+		public void setStatus(String status) {
+			this.status = status;
+		}
+        
+        
+    }
+}

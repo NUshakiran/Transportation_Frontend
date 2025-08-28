@@ -1,0 +1,53 @@
+package com.example.booking_service.model;
+
+
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+
+@Entity
+public class Booking {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long bookingId;
+
+    private Long customerId;
+
+    private Long vehicleId;
+
+    private Long driverId;  // optional, can be null
+
+    private Long routeId;   // optional
+
+    private Instant bookingDate;
+
+    private String status;  // CONFIRMED, CANCELLED, COMPLETED
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
+
+    
+    @PrePersist
+    public void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = createdAt;
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+}
+
+	
